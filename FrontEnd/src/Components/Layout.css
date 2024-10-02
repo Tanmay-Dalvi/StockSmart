@@ -1,0 +1,42 @@
+.header {
+    background-color: #e5f3f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 20px;
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+}
+
+.sidebar {
+    width: 180px;
+    background-color: #c1edf9;
+    position: fixed;
+    top: 79px;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+.sidebar-item {
+    padding: 15px 35px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.menu-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.active {
+    background-color: #d9e4f0; /* Updated active item background */
+}
+
+.content {
+    margin-left: 220px; /* Space for sidebar */
+    padding-top: 70px; /* Space for header */
+}

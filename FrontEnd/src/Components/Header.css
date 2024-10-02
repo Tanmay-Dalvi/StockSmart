@@ -1,0 +1,49 @@
+.header {
+    background-color: #ffffff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    z-index: 1;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    padding-right: 25px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+.search-box {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.header-icons img {
+    width: 30px; /* Adjust to your preferred size */
+    height: 30px; /* Adjust to your preferred size */
+    transition: transform 0.2s;
+}
+
+.header-icons img:hover {
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}

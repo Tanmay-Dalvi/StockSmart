@@ -1,0 +1,61 @@
+.sign-up-page {
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    padding: 50px;
+    background-color: #d9f2ff;
+    min-height: 100vh; /* Ensures full-height background */
+}
+
+.sign-up-box {
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
+    background-color: #ffffff;
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    padding: 30px;
+    width: 600px; /* Set width of the box */
+}
+
+.form-group {
+    margin: 15px 0;
+    width: 100%; /* Full width of the parent container */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 96.5%; /* Full width of the parent container */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center; /* Align checkbox and label vertically */
+    margin: 15px 0; /* Spacing around the checkbox */
+}
+
+.checkbox-group input {
+    margin-right: 10px; /* Space between checkbox and label */
+}
+
+.submit-button {
+    padding: 10px;
+    background-color: #03a5fd;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%; /* Full width to match input fields */
+    margin-top: 10px; /* Add margin for spacing */
+    transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #028fdc;
+}

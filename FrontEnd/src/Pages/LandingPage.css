@@ -1,0 +1,202 @@
+/* Header Styles */
+.landingheader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: rgb(255, 255, 255); /* Optional: background for header */
+}
+
+.logo h1 {
+    margin: 0;
+}
+
+.nav {
+    display: flex;
+}
+
+.nav-button {
+    margin-left: 15px;
+    padding: 10px 28px;
+    color: #0078BB; /* Blue text color */
+    border: none;
+    background: none; /* No background */
+    cursor: pointer;
+}
+
+/* Hero Section Styles */
+.hero-section {
+    display: flex;
+    flex-direction: row; /* Align text and image side by side */
+    justify-content: space-between; /* Space out text and image */
+    align-items: center; /* Center content vertically */
+    height: 100vh; /* Full viewport height */
+    background-color: #0078BB; /* Blue background */
+    color: white; /* Text color */
+    padding: 20px; /* Add some padding */
+}
+
+.hero-text {
+    flex: 1; /* Allow text to take up available space */
+    max-width: 600px; /* Optional: Limit the width of the text */
+    text-align: left; /* Align text to the left */
+    padding-left: 20px; /* Reduce left padding */
+}
+
+.hero-heading {
+    font-size: 48px; /* Increase heading size */
+}
+
+.hero-description {
+    font-size: 20px; /* Increase text size */
+}
+
+.hero-image {
+    flex: 2; /* Allow image to take up available space */
+    max-width: 500px; /* Optional: Limit the width of the image */
+}
+
+.hero-image img {
+    width: 100%; /* Ensure the image fills its container */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.get-started-button {
+    background-color: #00A3FF; /* Button color */
+    color: white; /* Button text color */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px; /* Button padding */
+    cursor: pointer;
+    margin-top: 20px; /* Space above the button */
+}
+
+/* UI Screenshot Section */
+.ui-screenshot-section {
+    text-align: center;
+    padding: 50px 0; /* Space around the section */
+}
+
+.ui-screenshot-section img {
+    width: 80%; /* Adjust as needed */
+    max-width: 600px; /* Max width for larger screens */
+    height: auto; /* Maintain aspect ratio */
+}
+
+/* Services Section Styles */
+/* Services Section Styles */
+.service-section {
+    display: flex; /* Align cards in a row */
+    overflow: hidden; /* Hide scrollbar */
+    position: relative; /* For positioning the button */
+    padding: 20px; /* Add padding */
+}
+
+.service-cards {
+    display: flex; /* Flexbox for horizontal alignment */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    scroll-behavior: smooth; /* Smooth scrolling */
+    padding: 10px 0; /* Padding for better aesthetics */
+    scrollbar-width: none; /* For Firefox: hide scrollbar */
+}
+
+.service-cards::-webkit-scrollbar {
+    display: none; /* For Chrome/Safari: hide scrollbar */
+}
+
+.service-card {
+    min-width: 300px; /* Increased minimum width for each card */
+    margin: 10px; /* Spacing between cards */
+    background: #6cd5ff; /* Card background */
+    border-radius: 8px; /* Rounded corners */
+    padding: 15px; /* Padding inside the card */
+    text-align: center; /* Center text inside cards */
+    height: 350px; /* Set height for uniformity */
+}
+
+.service-card img {
+    width: 100%; /* Make the image take the full width of the card */
+    height: auto; /* Maintain the aspect ratio */
+    max-height: 150px; /* Set a maximum height to prevent overflow */
+    object-fit: cover; /* Cover the card area without distortion */
+    border-radius: 5px; /* Slightly round the corners of the images */
+}
+
+/* Scroll button styles */
+.scroll-button {
+    position: absolute; /* Absolute positioning */
+    right: 10px; /* Position it at the right side */
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%); /* Adjust for perfect centering */
+    background-color: #00A3FF; /* Button color */
+    color: white; /* Button text color */
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 40px; /* Width */
+    height: 40px; /* Height */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Footer Styles */
+.footer {
+    background-color: #f0f8ff; /* Light blue background */
+    padding: 20px; /* Padding for footer */
+    text-align: center; /* Center align text */
+}
+
+/* Feedback Container */
+.feedback-container {
+    display: flex; /* Flex for input and button */
+    justify-content: center; /* Center them horizontally */
+    margin-bottom: 10px; /* Space below the input */
+}
+
+/* Feedback Input */
+.feedback-input {
+    width: 80%; /* Adjust size of feedback input */
+    max-width: 400px; /* Limit maximum width */
+    padding: 10px; /* Padding for input */
+    border: 1px solid #ccc; /* Border style */
+    border-radius: 4px; /* Rounded corners */
+}
+
+/* Send Button */
+.send-button {
+    background-color: #0078BB; /* Button color */
+    color: white; /* Button text color */
+    border: none;
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for button */
+    margin-left: 10px; /* Space between input and button */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Social Icons */
+.social-icon {
+    width: 30px; /* Set a uniform width */
+    height: 30px; /* Set a uniform height */
+    object-fit: contain; /* Maintain the aspect ratio */
+    margin: 0 10px; /* Space between icons */
+}
+
+/* Footer Content */
+.footer-content {
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center align items */
+    padding: 20px; /* Padding around content */
+}
+
+/* Social Icons Container */
+.social-icons {
+    display: flex; /* Use flexbox */
+    justify-content: center; /* Center-align icons */
+    margin-bottom: 10px; /* Space between icons and text */
+}
+
+/* Centering Footer Text */
+.footer p {
+    margin: 5px 0; /* Space between footer text lines */
+}
+
+

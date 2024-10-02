@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.content {
+  margin-left: 220px; /* Space for sidebar */
+  padding-top: 70px; /* Space for header */
+}
