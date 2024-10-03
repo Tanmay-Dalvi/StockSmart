@@ -25,7 +25,6 @@ Whether you're managing a small business or a large-scale operation, StockSmart 
   Generate reports that show your inventory status, sales history, and demand forecasts, all at your fingertips.
 
 ## Technology Stack 💻
-## Technology Stack 💻
 
 **Frontend**:  
 - HTML, CSS, JavaScript (React) for a dynamic and responsive user experience.
