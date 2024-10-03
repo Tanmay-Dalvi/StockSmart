@@ -1,82 +1,128 @@
-/* General profile page styles */
-.profile-page {
-    width: 100%;
-    height: 95vh; /* Full height of the viewport */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Align items to the left */
+:root {
+  --blue: #1a3664;
+  --light-blue: #0090e3;
+  --cyan: #00c2cb;
+  --teal: #79c7bb;
+  --green: #15c39a;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+  --dark-gray: #343a40;
+}
+
+.stocksmart-profile-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+  background-color: var(--light-gray);
+}
+
+.stocksmart-profile-title {
+  font-size: 2.5rem;
+  color: var(--blue);
+  margin-bottom: 30px;
+}
+
+.stocksmart-profile-card {
+  background-color: #9dd9fc;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.stocksmart-profile-info h2 {
+  color: var(--blue);
+  margin-bottom: 20px;
+}
+
+.stocksmart-profile-info p {
+  margin: 10px 0;
+  color: var(--dark-gray);
+}
+
+.stocksmart-edit-profile-button,
+.stocksmart-save-profile-button {
+  background-color: var(--blue);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.stocksmart-edit-profile-button:hover,
+.stocksmart-save-profile-button:hover {
+  background-color: var(--light-blue);
+}
+
+.stocksmart-profile-form {
+  background-color: #9dd9fc;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.stocksmart-form-field {
+  margin-bottom: 20px;
+}
+
+.stocksmart-form-field label {
+  display: block;
+  margin-bottom: 5px;
+  color:rgb(0, 0, 0);
+}
+
+.stocksmart-form-field input,
+.stocksmart-form-field select {
+  width: 96%;
+  padding: 10px;
+  border: 1px solid var(--light-blue);
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.stocksmart-form-field input:focus,
+.stocksmart-form-field select:focus {
+  outline: none;
+  border-color: var(--cyan);
+}
+
+.stocksmart-sign-out-container {
+  margin-top: 30px;
+}
+
+.stocksmart-sign-out-button {
+  background-color: var(--dark-gray);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.stocksmart-sign-out-button:hover {
+  background-color: #dc3545;
+}
+
+@media (max-width: 768px) {
+  .stocksmart-profile-page {
     padding: 20px;
-    box-sizing: border-box; /* Include padding in width/height calculations */
   }
-  
-  /* Title styles */
-  .profile-title {
-    font-size: 2rem; /* Size of the profile title */
-    margin-bottom: 20px; /* Space below the title */
+
+  .stocksmart-profile-card,
+  .stocksmart-profile-form {
+    padding: 20px;
   }
-  
-  /* Button container styles */
-  .button-container {
-    display: flex;
-    gap: 20px; /* Space between the buttons */
-    margin-bottom: 20px; /* Space below the button container */
-  }
-  
-  /* Edit profile button styles */
-  .edit-profile-button {
-    background-color: #007bff; /* Blue color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px; /* Padding for the button */
-    cursor: pointer;
-  }
-  
-  /* Sign out button styles */
-  .sign-out-container {
-    margin-top: auto; /* Push to the bottom of the profile page */
-  }
-  
-  .sign-out-button {
-    background-color: red; /* Red color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px; /* Padding for the button */
-    cursor: pointer;
-  }
-  
-  /* Form field styles */
-  .form-field {
-    margin-bottom: 15px; /* Space between form fields */
-    width: 100%; /* Full width */
-  }
-  
-  /* Input styles */
-  input[type="text"],
-  input[type="email"],
-  select {
-    width: 100%; /* Full width */
-    padding: 10px; /* Padding inside the input */
-    margin-top: 5px; /* Space above the input */
-    border: 1px solid #ccc; /* Border style */
-    border-radius: 4px; /* Rounded corners */
-  }
-  
-  /* Save profile button styles */
-  .save-profile-button {
-    background-color: #28a745; /* Green color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px; /* Padding for the button */
-    cursor: pointer;
-    margin-top: 20px; /* Space above the save button */
-    margin-bottom: 20px;
-  }
-  
-  /* Styles for profile info */
-  .profile-info {
-    margin-bottom: 20px; /* Space below the profile info */
-  }
-  
+}

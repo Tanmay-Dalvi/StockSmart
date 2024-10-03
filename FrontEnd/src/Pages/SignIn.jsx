@@ -1,39 +1,54 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Ensure Link is imported from react-router-dom
-import './SignIn.css'; // Ensure to import the CSS file
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './SignIn.css';
 
 const SignIn = ({ setIsAuthenticated }) => {
-    const handleSignIn = () => {
+    const [userId, setUserId] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSignIn = (e) => {
+        e.preventDefault();
         // Temporary logic for signing in
-        setIsAuthenticated(true); // Update authentication state
+        setIsAuthenticated(true);
+        // Here you would typically send a request to your authentication API
     };
 
     return (
         <div className="sign-in-page">
             <div className="sign-in-box">
                 <div className="form-container">
-                    <h1>Sign In</h1>
-                    <div className="form-group">
-                        <label htmlFor="userid">User ID</label>
-                        <input type="text" id="userid" placeholder="Enter your User ID" />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input type="password" id="password" placeholder="Enter your Password" />
-                    </div>
-                    <button className="submit-button" onClick={handleSignIn}>Submit</button>
+                    <h2 className="sign-in-title">Sign In</h2>
+                    <form onSubmit={handleSignIn}>
+                        <div className="form-group">
+                            <label htmlFor="userId">User ID</label>
+                            <input
+                                type="text"
+                                id="userId"
+                                value={userId}
+                                onChange={(e) => setUserId(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="password">Password</label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <button type="submit" className="submit-button">Submit</button>
+                    </form>
                     <button className="forgot-password-button">Forgot Password?</button>
+                    <p className="signup-prompt">
+                        Don't have an account? <Link to="/sign-up" className="signup-button">Sign Up</Link>
+                    </p>
                 </div>
                 <div className="image-container">
-                    {/* Replace with your vector image */}
-                    <img className="vector-image" rel="preload" src="../signin.jpg" as="image" alt="Vector Art" />
+                    <img src="/signin.png" alt="Sign In" className="vector-image" />
                 </div>
-            </div>
-            <div className="signup-prompt">
-                Already have an account? 
-                <Link to="/sign-up"> {/* Use Link to navigate to Sign Up page */}
-                    <button className="signup-button">Sign Up</button>
-                </Link>
             </div>
         </div>
     );

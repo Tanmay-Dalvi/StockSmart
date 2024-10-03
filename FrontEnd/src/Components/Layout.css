@@ -1,42 +1,24 @@
-.header {
-    background-color: #e5f3f9;
+.stocksmart-layout {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 20px;
-    position: fixed;
-    width: 100%;
-    z-index: 1;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.sidebar {
-    width: 180px;
-    background-color: #c1edf9;
-    position: fixed;
-    top: 79px;
-    bottom: 0;
-    overflow-y: auto;
-}
-
-.sidebar-item {
-    padding: 15px 35px;
+.stocksmart-main-container {
     display: flex;
-    align-items: center;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    flex: 1;
+    padding-top: 60px; /* Height of the header */
 }
 
-.menu-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
+.stocksmart-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f8f9fa;
+    margin-left: 200px; /* Width of the sidebar */
 }
 
-.active {
-    background-color: #d9e4f0; /* Updated active item background */
-}
-
-.content {
-    margin-left: 220px; /* Space for sidebar */
-    padding-top: 70px; /* Space for header */
+@media (max-width: 768px) {
+    .stocksmart-content {
+        margin-left: 0;
+    }
 }

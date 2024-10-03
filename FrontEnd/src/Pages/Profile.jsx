@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import './Profile.css'; // Import the CSS file
+import { useNavigate } from 'react-router-dom';
+import './Profile.css';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [profileImage, setProfileImage] = useState('/path/to/default/image.png'); // Default image path
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [businessAddress, setBusinessAddress] = useState('');
   const [gstNumber, setGstNumber] = useState('');
   const [businessContact, setBusinessContact] = useState('');
-  const [businessType, setBusinessType] = useState(''); // New state for business type
+  const [businessType, setBusinessType] = useState('');
 
   const handleEditProfile = () => {
     setIsEditing(true);
@@ -18,60 +19,33 @@ const Profile = () => {
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
-    setIsEditing(false); // Close the edit form
-  };
-
-  const handleProfileImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl); // Set the profile image to the selected file
-    }
+    setIsEditing(false);
   };
 
   return (
-    <div className="profile-page">
-      <h1 className="profile-title">Profile</h1>
+    <div className="stocksmart-profile-page">
+      <h1 className="stocksmart-profile-title">Profile</h1>
       
       {!isEditing && (
-        <div>
-          <h2>Your Details</h2>
-          <div className="profile-info">
-            <img src={profileImage} alt="Profile" className="profile-image" />
-            <p>Name: {name || "Not Provided"}</p>
-            <p>Email: {email || "Not Provided"}</p>
-            <p>Business Name: {businessName || "Not Provided"}</p>
-            <p>Business Address: {businessAddress || "Not Provided"}</p>
-            <p>GST Number: {gstNumber || "Not Provided"}</p>
-            <p>Business Contact Number: {businessContact || "Not Provided"}</p>
-            <p>Business Type: {businessType || "Not Provided"}</p> {/* Display Business Type */}
+        <div className="stocksmart-profile-card">
+          <div className="stocksmart-profile-info">
+            <h2>{name || "Your Name"}</h2>
+            <p><strong>Email:</strong> {email || "Not Provided"}</p>
+            <p><strong>Business Name:</strong> {businessName || "Not Provided"}</p>
+            <p><strong>Business Address:</strong> {businessAddress || "Not Provided"}</p>
+            <p><strong>GST Number:</strong> {gstNumber || "Not Provided"}</p>
+            <p><strong>Business Contact:</strong> {businessContact || "Not Provided"}</p>
+            <p><strong>Business Type:</strong> {businessType || "Not Provided"}</p>
           </div>
-          <div className="button-container">
-            <button className="edit-profile-button" onClick={handleEditProfile}>
-              Edit Profile
-            </button>
-          </div>
+          <button className="stocksmart-edit-profile-button" onClick={handleEditProfile}>
+            Edit Profile
+          </button>
         </div>
       )}
 
       {isEditing && (
-        <form onSubmit={handleSaveProfile}>
-          <div className="profile-picture-container">
-            <img src={profileImage} alt="Profile" className="profile-image" />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleProfileImageChange}
-              className="form-field"
-              style={{ display: 'none' }} // Hide the default file input
-              id="profileImageUpload"
-            />
-            <label htmlFor="profileImageUpload" className="upload-picture-button">
-              Upload Your Picture
-            </label>
-          </div>
-
-          <div className="form-field">
+        <form onSubmit={handleSaveProfile} className="stocksmart-profile-form">
+          <div className="stocksmart-form-field">
             <label>Name:</label>
             <input
               type="text"
@@ -81,7 +55,7 @@ const Profile = () => {
             />
           </div>
 
-          <div className="form-field">
+          <div className="stocksmart-form-field">
             <label>Email:</label>
             <input
               type="email"
@@ -91,7 +65,7 @@ const Profile = () => {
             />
           </div>
 
-          <div className="form-field">
+          <div className="stocksmart-form-field">
             <label>Business Name:</label>
             <input
               type="text"
@@ -101,7 +75,7 @@ const Profile = () => {
             />
           </div>
 
-          <div className="form-field">
+          <div className="stocksmart-form-field">
             <label>Business Address:</label>
             <input
               type="text"
@@ -111,7 +85,7 @@ const Profile = () => {
             />
           </div>
 
-          <div className="form-field">
+          <div className="stocksmart-form-field">
             <label>GST Number:</label>
             <input
               type="text"
@@ -121,7 +95,7 @@ const Profile = () => {
             />
           </div>
 
-          <div className="form-field">
+          <div className="stocksmart-form-field">
             <label>Business Contact Number:</label>
             <input
               type="text"
@@ -131,8 +105,7 @@ const Profile = () => {
             />
           </div>
 
-          {/* New Business Type Dropdown */}
-          <div className="form-field">
+          <div className="stocksmart-form-field">
             <label>Business Type:</label>
             <select
               value={businessType}
@@ -145,20 +118,18 @@ const Profile = () => {
               <option value="Limited Liability Company">Limited Liability Company</option>
               <option value="Corporation">Corporation</option>
               <option value="Non-Profit">Non-Profit</option>
-              {/* Add more options as needed */}
             </select>
           </div>
 
-          <button type="submit" className="save-profile-button">
+          <button type="submit" className="stocksmart-save-profile-button">
             Save Profile
           </button>
         </form>
       )}
       
-      {/* Sign Out Button displayed only when not editing */}
       {!isEditing && (
-        <div className="sign-out-container">
-          <button className="sign-out-button">Sign Out</button>
+        <div className="stocksmart-sign-out-container">
+            <button className="stocksmart-sign-out-button" onClick={() => navigate('/sign-in')}>Sign Out</button>
         </div>
       )}
     </div>

@@ -4,23 +4,20 @@ import "./Header.css";
 
 const Header = () => {
     return (
-        <header className="header">
-            <div className="logo">
-                <span style={{ color: "#0078BB" }}>Stock</span>
-                <span style={{ color: "#00A3FF" }}>Smart</span>
-            </div>
-            <div className="header-icons">
-                <div className="search-container">
-                    <input type="text" placeholder="Search..." className="search-box" />
-                    <button className="icon-button">
-                        <img src="/search.png" alt="Search Icon" className="search-icon" />
+        <header className="stocksmart-header">
+            <div className="stocksmart-logo">StockSmart</div>
+            <div className="stocksmart-header-icons">
+                <div className="stocksmart-search-container">
+                    <input type="text" placeholder="Search..." className="stocksmart-search-box" />
+                    <button className="stocksmart-icon-button stocksmart-search-button">
+                        <img src="/search.png" alt="Search" />
                     </button>
                 </div>
-                <Link to="/notification" className="icon-button">
-                    <img src="/notification.png" alt="Notification Icon" className="notification" />
+                <Link to="/notification" className="stocksmart-icon-button">
+                    <img src="/notification.png" alt="Notifications" />
                 </Link>
-                <Link to="/profile" className="icon-button">
-                    <img src="/profile.png" alt="Profile Icon" className="profile-icon" />
+                <Link to="/profile" className="stocksmart-icon-button">
+                    <img src="/profile.png" alt="Profile" />
                 </Link>
             </div>
         </header>

@@ -13,12 +13,14 @@ const Layout = ({ activeItem, onItemClick }) => {
     };
 
     return (
-        <div className="layout">
+        <div className="stocksmart-layout">
             <Header />
-            <Sidebar activeItem={activeItem} onItemClick={handleNavigation} />
-            <main className="content">
-                <Outlet />
-            </main>
+            <div className="stocksmart-main-container">
+                <Sidebar activeItem={activeItem} onItemClick={handleNavigation} />
+                <main className="stocksmart-content">
+                    <Outlet />
+                </main>
+            </div>
         </div>
     );
 };
