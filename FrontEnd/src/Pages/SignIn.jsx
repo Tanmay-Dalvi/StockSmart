@@ -48,9 +48,9 @@ const SignIn = ({ setIsAuthenticated }) => {
                                 required
                             />
                         </div>
+                        <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
                         <button type="submit" className="submit-button">Sign In</button>
                     </form>
-                    <button className="forgot-password-button">Forgot Password?</button>
                     <p className="signup-prompt">
                         Don't have an account? <Link to="/sign-up" className="signup-button">Sign Up</Link>
                     </p>
