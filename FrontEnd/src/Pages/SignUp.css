@@ -1,6 +1,6 @@
 /* SignUp.css */
 
-.sign-up-page {
+.stocksmart-signup-page {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -9,7 +9,7 @@
     padding: 20px;
 }
 
-.sign-up-box {
+.stocksmart-signup-box {
     background-color: #ffffff;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -18,62 +18,61 @@
     max-width: 500px;
 }
 
-.sign-up-box h1 {
+.stocksmart-signup-title {
     color: #1a3664;
     font-size: 28px;
     margin-bottom: 30px;
     text-align: center;
 }
 
-.form-group {
+.stocksmart-form-group {
     margin-bottom: 20px;
 }
 
-.form-group label {
+.stocksmart-form-label {
     display: block;
     margin-bottom: 5px;
     color: #343a40;
 }
 
-.form-group input {
+.stocksmart-form-input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc; /* Changed from #f8f9fa to #ccc for better visibility */
+    border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
     transition: border-color 0.3s;
-    box-sizing: border-box; /* Ensures padding doesn't affect overall width */
+    box-sizing: border-box;
 }
 
-.form-group input:focus {
+.stocksmart-form-input:focus {
     border-color: #00c2cb;
     outline: none;
 }
 
-/* Specific styles for phone and password inputs */
-.form-group input[type="tel"],
-.form-group input[type="password"] {
-    -webkit-appearance: none; /* Removes default styling on iOS */
-    -moz-appearance: none; /* Removes default styling on Firefox */
-    appearance: none; /* Removes default styling */
+.stocksmart-form-input[type="tel"],
+.stocksmart-form-input[type="password"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
-.checkbox-group {
+.stocksmart-checkbox-group {
     display: flex;
     align-items: center;
     margin-bottom: 20px;
 }
 
-.checkbox-group input {
+.stocksmart-checkbox-input {
     margin-right: 10px;
 }
 
-.checkbox-group label {
+.stocksmart-checkbox-label {
     font-size: 14px;
     color: #343a40;
 }
 
-.submit-button {
+.stocksmart-submit-button {
     width: 100%;
     padding: 12px;
     background-color: #00c2cb;
@@ -85,12 +84,58 @@
     transition: background-color 0.3s;
 }
 
-.submit-button:hover {
+.stocksmart-submit-button:hover {
     background-color: #79c7bb;
 }
 
+.stocksmart-signup-error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: center;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.stocksmart-password-strength {
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.stocksmart-strength-meter {
+    height: 5px;
+    background-color: #e0e0e0;
+    margin-bottom: 5px;
+}
+
+.stocksmart-strength-meter.stocksmart-strength-1 {
+    width: 25%;
+    background-color: #ff4d4d;
+}
+
+.stocksmart-strength-meter.stocksmart-strength-2 {
+    width: 50%;
+    background-color: #ffa64d;
+}
+
+.stocksmart-strength-meter.stocksmart-strength-3 {
+    width: 75%;
+    background-color: #99cc00;
+}
+
+.stocksmart-strength-meter.stocksmart-strength-4 {
+    width: 100%;
+    background-color: #00cc66;
+}
+
+.stocksmart-strength-text {
+    color: #343a40;
+}
+
 @media (max-width: 768px) {
-    .sign-up-box {
+    .stocksmart-signup-box {
         padding: 30px;
     }
 }

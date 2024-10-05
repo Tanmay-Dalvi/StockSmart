@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { loginUser } from '../services/api';
 import './SignIn.css';
 
 const SignIn = ({ setIsAuthenticated }) => {
-    const [userId, setUserId] = useState('');
+    const navigate = useNavigate();
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-    const handleSignIn = (e) => {
+    const handleSignIn = async (e) => {
         e.preventDefault();
-        // Temporary logic for signing in
-        setIsAuthenticated(true);
-        // Here you would typically send a request to your authentication API
+        try {
+            const response = await loginUser({ email, password });
+            localStorage.setItem('token', response.access_token);
+            setIsAuthenticated(true);
+            navigate('/dashboard');
+        } catch (error) {
+            setError(error.response?.data?.error || 'Invalid credentials. Please try again.');
+        }
     };
 
     return (
@@ -18,14 +26,15 @@ const SignIn = ({ setIsAuthenticated }) => {
             <div className="sign-in-box">
                 <div className="form-container">
                     <h2 className="sign-in-title">Sign In</h2>
+                    {error && <p className="error-message">{error}</p>}
                     <form onSubmit={handleSignIn}>
                         <div className="form-group">
-                            <label htmlFor="userId">User ID</label>
+                            <label htmlFor="email">Email</label>
                             <input
-                                type="text"
-                                id="userId"
-                                value={userId}
-                                onChange={(e) => setUserId(e.target.value)}
+                                type="email"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
                         </div>
@@ -39,7 +48,7 @@ const SignIn = ({ setIsAuthenticated }) => {
                                 required
                             />
                         </div>
-                        <button type="submit" className="submit-button">Submit</button>
+                        <button type="submit" className="submit-button">Sign In</button>
                     </form>
                     <button className="forgot-password-button">Forgot Password?</button>
                     <p className="signup-prompt">
