@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getUserInfo, getInventory, generateBill } from '../services/api';
+import { getUserInfo, getInventory, generateBill} from '../services/api';
 import './Billing.css';
 
 const Billing = () => {
@@ -17,8 +17,9 @@ const Billing = () => {
 
   useEffect(() => {
     calculateTotal();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProducts]);
-
+  
   const fetchBusinessDetails = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -97,14 +98,14 @@ const removeProductFromBill = (index) => {
       // Cleanup
       window.URL.revokeObjectURL(url);
       
-      // Optionally, show a success message to the user
+      // Show a success message to the user
       alert('Bill generated and downloaded successfully!');
     } catch (error) {
       console.error('Failed to generate bill:', error);
       setError('Failed to generate bill: ' + (error.response?.data?.error || error.message));
     }
   };
-    
+      
   return (
     <div className="billing-container">
       <h1>Billing</h1>
