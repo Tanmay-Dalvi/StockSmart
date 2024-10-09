@@ -141,28 +141,32 @@ export const downloadInventory = async (token) => {
         headers: { 
           Authorization: `Bearer ${token}` 
         },
-        responseType: 'blob'  // Important for downloading files
+        responseType: 'blob'
       }
     );
     
-    // Create a blob from the response data
     const blob = new Blob([response.data], { type: 'text/csv' });
-    
-    // Create a download link
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.setAttribute('download', 'inventory.csv');
     
-    // Trigger the download
     document.body.appendChild(link);
     link.click();
     
-    // Cleanup
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Download error:', error);
-    throw handleApiError(error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    } else {
+      console.error('Error setting up request:', error.message);
+    }
+    throw error;
   }
 };

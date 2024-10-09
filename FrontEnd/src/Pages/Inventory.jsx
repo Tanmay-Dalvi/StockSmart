@@ -8,7 +8,9 @@ const Inventory = () => {
   const [productsPerPage] = useState(10);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isVendorModalOpen, setIsVendorModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
+  const [currentVendor, setCurrentVendor] = useState({});
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,14 +50,7 @@ const Inventory = () => {
     try {
       setError(null);
       const token = localStorage.getItem('token');
-      console.log('Updating product:', product); // Debug log
-      await updateProduct(token, product._id, {
-        product: product.product,
-        brand: product.brand,
-        category: product.category,
-        selling_price: product.selling_price,
-        quantity: product.quantity
-      });
+      await updateProduct(token, product._id, product);
       await fetchInventory();
       setIsEditModalOpen(false);
     } catch (error) {
@@ -89,6 +84,15 @@ const Inventory = () => {
     }
   };
 
+  const handleVendorClick = (vendor) => {
+    if (vendor) {
+      setCurrentVendor(vendor);
+      setIsVendorModalOpen(true);
+    } else {
+      console.error('Vendor information is missing');
+    }
+  };
+
   // Pagination
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -115,6 +119,7 @@ const Inventory = () => {
                 <th>Category</th>
                 <th>Price</th>
                 <th>Quantity</th>
+                <th>Vendor</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -125,8 +130,20 @@ const Inventory = () => {
                   <td>{product.product}</td>
                   <td>{product.brand}</td>
                   <td>{product.category}</td>
-                  <td>${product.selling_price}</td>
+                  <td>₹{product.selling_price}</td>
                   <td>{product.quantity}</td>
+                  <td>
+                    {product.vendor ? (
+                      <button 
+                        className="vendor-link-button"
+                        onClick={() => handleVendorClick(product.vendor)}
+                      >
+                        {product.vendor.name || 'View Vendor'}
+                      </button>
+                    ) : (
+                      'N/A'
+                    )}
+                  </td>
                   <td>
                     <div className="action-buttons">
                       <button 
@@ -175,6 +192,14 @@ const Inventory = () => {
               title="Update Product"
             />
           )}
+
+          {isVendorModalOpen && (
+            <VendorModal
+              isOpen={isVendorModalOpen}
+              onClose={() => setIsVendorModalOpen(false)}
+              vendor={currentVendor}
+            />
+          )}
         </>
       )}
     </div>
@@ -193,8 +218,10 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, title }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'selling_price' || name === 'quantity' 
-        ? Number(value) 
+      [name]: ['selling_price', 'cost_price', 'quantity'].includes(name)
+        ? Number(value)
+        : name === 'vendor'
+        ? { ...prev.vendor, [e.target.dataset.vendorField]: value }
         : value
     }));
   };
@@ -203,7 +230,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, title }) => {
     e.preventDefault();
     try {
       setError(null);
-      console.log('Submitting form data:', formData); // Debug log
       await onSubmit(formData);
       onClose();
     } catch (error) {
@@ -242,10 +268,18 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, title }) => {
             required
           />
           <input
+            name="cost_price"
+            value={formData.cost_price || ''}
+            onChange={handleChange}
+            placeholder="Cost Price"
+            type="number"
+            required
+          />
+          <input
             name="selling_price"
             value={formData.selling_price || ''}
             onChange={handleChange}
-            placeholder="Price"
+            placeholder="Selling Price"
             type="number"
             required
           />
@@ -257,11 +291,51 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, title }) => {
             type="number"
             required
           />
+          <input
+            name="vendor"
+            value={formData.vendor?.name || ''}
+            onChange={handleChange}
+            data-vendor-field="name"
+            placeholder="Vendor Name"
+            required
+          />
+          <input
+            name="vendor"
+            value={formData.vendor?.phone || ''}
+            onChange={handleChange}
+            data-vendor-field="phone"
+            placeholder="Vendor Phone"
+            required
+          />
+          <input
+            name="vendor"
+            value={formData.vendor?.address || ''}
+            onChange={handleChange}
+            data-vendor-field="address"
+            placeholder="Vendor Address"
+            required
+          />
           <div className="modal-buttons">
             <button type="submit">Submit</button>
             <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+};
+
+const VendorModal = ({ isOpen, onClose, vendor }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal">
+      <div className="modal-content">
+        <h2>Vendor Details</h2>
+        <p><strong>Name:</strong> {vendor.name || 'N/A'}</p>
+        <p><strong>Phone:</strong> {vendor.phone || 'N/A'}</p>
+        <p><strong>Address:</strong> {vendor.address || 'N/A'}</p>
+        <button onClick={onClose}>Close</button>
       </div>
     </div>
   );

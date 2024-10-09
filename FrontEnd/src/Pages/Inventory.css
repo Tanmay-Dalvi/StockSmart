@@ -198,3 +198,20 @@
 .modal-content button[type="button"]:hover {
   background-color: #23272b;
 }
+
+.vendor-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+  color: #0000EE;  /* Default link color */
+  text-decoration: underline;
+}
+
+.vendor-link-button:hover,
+.vendor-link-button:focus {
+  color: #551A8B;  /* Visited link color */
+  text-decoration: none;
+}
