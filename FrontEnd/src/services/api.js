@@ -170,3 +170,29 @@ export const downloadInventory = async (token) => {
     throw error;
   }
 };
+
+export const generateBill = async (token, billData) => {
+  try {
+    const response = await axios.post(`${API_URL}/generate-bill`, billData, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      responseType: 'blob'  // Important for receiving binary data (PDF)
+    });
+    
+    // Create a Blob from the PDF Stream
+    const file = new Blob([response.data], { type: 'application/pdf' });
+    
+    // Create a link element, hide it, direct it towards the blob, and then trigger a click
+    const fileURL = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = fileURL;
+    link.download = 'bill.pdf';
+    link.click();
+
+    return { success: true, message: 'Bill generated and downloaded successfully' };
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};

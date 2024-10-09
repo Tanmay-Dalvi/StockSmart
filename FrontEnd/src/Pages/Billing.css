@@ -1,0 +1,63 @@
+.billing-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .business-details {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .product-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .product-input select,
+  .product-input input {
+    padding: 5px;
+    font-size: 16px;
+  }
+  
+  .bill-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .bill-table th,
+  .bill-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .bill-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .bill-summary {
+    text-align: right;
+  }
+  
+  .error-message {
+    color: red;
+    margin-bottom: 10px;
+  }
+  
+  button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
