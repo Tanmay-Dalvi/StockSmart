@@ -12,6 +12,21 @@ const handleApiError = (error) => {
   }  
 };
 
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const setAuthToken = (token) => {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+  }
+};
+
 export const registerUser = async (userData) => {
   try {
     const response = await axios.post(`${API_URL}/register`, userData);
@@ -61,6 +76,93 @@ export const changePassword = async (token, oldPassword, newPassword) => {
     );
     return response.data;
   } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const initializeAuth = () => {
+  const token = localStorage.getItem('token');
+  setAuthToken(token);
+};
+
+export const getInventory = async (token) => {
+  try {
+    const response = await axios.get(`${API_URL}/inventory`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 500) {
+      console.error('Server error:', error.response.data);
+      throw new Error('Internal server error. Please try again later.');
+    }
+    throw handleApiError(error);
+  }
+};
+
+export const addProduct = async (token, productData) => {
+  try {
+    const response = await axios.post(`${API_URL}/inventory`, productData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const updateProduct = async (token, productId, productData) => {
+  try {
+    const response = await axios.put(`${API_URL}/inventory/${productId}`, productData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const deleteProduct = async (token, productId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/inventory/${productId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
+
+export const downloadInventory = async (token) => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/inventory/download`,
+      {
+        headers: { 
+          Authorization: `Bearer ${token}` 
+        },
+        responseType: 'blob'  // Important for downloading files
+      }
+    );
+    
+    // Create a blob from the response data
+    const blob = new Blob([response.data], { type: 'text/csv' });
+    
+    // Create a download link
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'inventory.csv');
+    
+    // Trigger the download
+    document.body.appendChild(link);
+    link.click();
+    
+    // Cleanup
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Download error:', error);
     throw handleApiError(error);
   }
 };
