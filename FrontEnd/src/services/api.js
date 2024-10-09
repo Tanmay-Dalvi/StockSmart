@@ -17,6 +17,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true  // Include credentials with every request
 });
 
 const setAuthToken = (token) => {
@@ -181,17 +182,7 @@ export const generateBill = async (token, billData) => {
       responseType: 'blob'  // Important for receiving binary data (PDF)
     });
     
-    // Create a Blob from the PDF Stream
-    const file = new Blob([response.data], { type: 'application/pdf' });
-    
-    // Create a link element, hide it, direct it towards the blob, and then trigger a click
-    const fileURL = URL.createObjectURL(file);
-    const link = document.createElement('a');
-    link.href = fileURL;
-    link.download = 'bill.pdf';
-    link.click();
-
-    return { success: true, message: 'Bill generated and downloaded successfully' };
+    return response.data;
   } catch (error) {
     throw handleApiError(error);
   }

@@ -72,7 +72,7 @@ const removeProductFromBill = (index) => {
     setTotalAmount(total);
   };
 
-const handleGenerateBill = async () => {
+  const handleGenerateBill = async () => {
     try {
       const token = localStorage.getItem('token');
       const billData = {
@@ -81,13 +81,30 @@ const handleGenerateBill = async () => {
         businessDetails
       };
       const response = await generateBill(token, billData);
-      console.log('Bill generated:', response);
-      // Handle successful bill generation (e.g., show a success message)
+      
+      // Create a Blob from the response data
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a link and trigger the download
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'bill.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      
+      // Optionally, show a success message to the user
+      alert('Bill generated and downloaded successfully!');
     } catch (error) {
-      setError('Failed to generate bill: ' + error.message);
+      console.error('Failed to generate bill:', error);
+      setError('Failed to generate bill: ' + (error.response?.data?.error || error.message));
     }
   };
-  
+    
   return (
     <div className="billing-container">
       <h1>Billing</h1>
