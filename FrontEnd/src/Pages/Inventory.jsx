@@ -46,33 +46,55 @@ const Inventory = () => {
     }
   };
 
-  const handleUpdateProduct = async (product) => {
+  const handleUpdateProduct = async (productData) => {
     try {
       setError(null);
+      setIsLoading(true);
       const token = localStorage.getItem('token');
-      await updateProduct(token, product._id, product);
-      await fetchInventory();
+      
+      // Use product_id if available, otherwise use _id
+      const productId = productData.product_id || productData._id;
+      
+      if (!productId) {
+        throw new Error('Product ID is missing');
+      }
+      
+      await updateProduct(token, productId, productData);
+      await fetchInventory(); // Refresh the list
       setIsEditModalOpen(false);
     } catch (error) {
       console.error('Error updating product:', error);
-      setError('Failed to update product');
+      setError(error.message || 'Failed to update product');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = async (product) => {
     try {
       setError(null);
+      setIsLoading(true);
+      
+      // Use product_id if available, otherwise use _id
+      const productId = product.product_id || product._id;
+      
+      if (!productId) {
+        throw new Error('Product ID is missing');
+      }
+
       if (window.confirm('Are you sure you want to delete this product?')) {
         const token = localStorage.getItem('token');
         await deleteProduct(token, productId);
-        await fetchInventory();
+        await fetchInventory(); // Refresh the list
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      setError('Failed to delete product');
+      setError(error.message || 'Failed to delete product');
+    } finally {
+      setIsLoading(false);
     }
   };
-
+  
   const handleDownloadData = async () => {
     try {
       setError(null);
@@ -125,8 +147,8 @@ const Inventory = () => {
             </thead>
             <tbody>
               {currentProducts.map((product) => (
-                <tr key={product._id}>
-                  <td>{product._id}</td>
+                <tr key={product._id || product.product_id}>
+                  <td>{product.product_id || product._id}</td>
                   <td>{product.product}</td>
                   <td>{product.brand}</td>
                   <td>{product.category}</td>
@@ -157,7 +179,7 @@ const Inventory = () => {
                       </button>
                       <button 
                         className="delete-btn" 
-                        onClick={() => handleDeleteProduct(product._id)}
+                        onClick={() => handleDeleteProduct(product)}
                       >
                         Delete
                       </button>

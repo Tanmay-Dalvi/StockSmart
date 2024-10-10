@@ -2,14 +2,15 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
-const handleApiError = (error) => {  
-  if (error.response) {  
-    throw error;  // This allows the component to handle the error
-  } else if (error.request) {  
-    throw new Error('No response received from server');  
-  } else {  
-    throw new Error(`Request setup error: ${error.message}`);  
-  }  
+const handleApiError = (error) => {
+  console.error('API Error:', error);
+  if (error.response) {
+    throw new Error(error.response.data.error || error.response.statusText);
+  } else if (error.request) {
+    throw new Error('No response received from server');
+  } else {
+    throw new Error(`Request setup error: ${error.message}`);
+  }
 };
 
 const api = axios.create({
@@ -114,9 +115,19 @@ export const addProduct = async (token, productData) => {
 
 export const updateProduct = async (token, productId, productData) => {
   try {
-    const response = await axios.put(`${API_URL}/inventory/${productId}`, productData, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    // Remove _id from the data before sending
+    const { _id, ...dataToSend } = productData;
+    
+    const response = await axios.put(
+      `${API_URL}/inventory/${productId}`,
+      dataToSend,
+      {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
     return response.data;
   } catch (error) {
     throw handleApiError(error);
@@ -125,9 +136,14 @@ export const updateProduct = async (token, productId, productData) => {
 
 export const deleteProduct = async (token, productId) => {
   try {
-    const response = await axios.delete(`${API_URL}/inventory/${productId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.delete(
+      `${API_URL}/inventory/${productId}`,
+      {
+        headers: { 
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
     return response.data;
   } catch (error) {
     throw handleApiError(error);
@@ -196,6 +212,7 @@ export const getSalesData = async (token) => {
         'Content-Type': 'application/json'
       }
     });
+    
     return response.data;
   } catch (error) {
     throw handleApiError(error);
