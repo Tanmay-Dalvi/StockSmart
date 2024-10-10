@@ -1,0 +1,60 @@
+.sales-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  
+  .sales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .sales-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s ease;
+  }
+  
+  .sales-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .sales-card h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .sales-card p {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 5px 0;
+  }
+  
+  .sales-card p:last-child {
+    color: #4caf50;
+    font-weight: bold;
+  }
+  
+  @media (max-width: 768px) {
+    .sales-grid {
+      grid-template-columns: 1fr;
+    }
+  }

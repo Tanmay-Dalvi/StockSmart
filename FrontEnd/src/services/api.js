@@ -187,3 +187,17 @@ export const generateBill = async (token, billData) => {
     throw handleApiError(error);
   }
 };
+
+export const getSalesData = async (token) => {
+  try {
+    const response = await axios.get(`${API_URL}/sales`, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};
