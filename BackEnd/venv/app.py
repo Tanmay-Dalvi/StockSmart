@@ -619,53 +619,6 @@ def get_sales():
         start_of_month = today.replace(day=1)
         start_of_year = today.replace(month=1, day=1)
 
-        # Fetch Daily Sales
-        daily = daily_sales_collection.find_one({"date": today}) or {"revenue": 0, "profit": 0}
-
-        # Fetch Weekly Sales
-        weekly_sales = weekly_sales_collection.find_one({"date": start_of_week}) or {"revenue": 0, "profit": 0}
-
-        # Fetch Monthly Sales (sum of all daily sales in the current month)
-        monthly_sales = daily_sales_collection.aggregate([
-            {"$match": {"date": {"$gte": start_of_month, "$lte": today}}},
-            {"$group": {
-                "_id": None,
-                "revenue": {"$sum": "$revenue"},
-                "profit": {"$sum": "$profit"}
-            }}
-        ]).next()
-
-        # Fetch Yearly Sales (sum of all daily sales in the current year)
-        yearly_sales = daily_sales_collection.aggregate([
-            {"$match": {"date": {"$gte": start_of_year, "$lte": today}}},
-            {"$group": {
-                "_id": None,
-                "revenue": {"$sum": "$revenue"},
-                "profit": {"$sum": "$profit"}
-            }}
-        ]).next()
-
-        return jsonify({
-            "daily": {"revenue": daily["revenue"], "profit": daily["profit"]},
-            "weekly": {"revenue": weekly_sales["revenue"], "profit": weekly_sales["profit"]},
-            "monthly": {"revenue": monthly_sales.get("revenue", 0), "profit": monthly_sales.get("profit", 0)},
-            "yearly": {"revenue": yearly_sales.get("revenue", 0), "profit": yearly_sales.get("profit", 0)}
-        }), 200
-
-    except Exception as e:
-        app.logger.error(f"Error fetching sales data: {str(e)}")
-        return jsonify({"error": "An error occurred while fetching sales data"}), 500
-
-@app.route('/api/sales', methods=['GET'])
-@jwt_required()
-def get_sales():
-    try:
-        user_id = get_jwt_identity()
-        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        start_of_week = today - timedelta(days=today.weekday())
-        start_of_month = today.replace(day=1)
-        start_of_year = today.replace(month=1, day=1)
-
         # Update sales collections
         update_sales_collections()
 
