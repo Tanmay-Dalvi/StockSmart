@@ -16,6 +16,7 @@ from reportlab.lib.pagesizes import letter
 from datetime import datetime, timedelta
 from datetime import datetime, timedelta
 import uuid
+import logging
 
 app = Flask(__name__)
 
@@ -215,14 +216,8 @@ def add_product():
         data = request.json
         data['user_id'] = user_id
         
-        # Generate or validate product_id
-        if 'product_id' not in data:
-            data['product_id'] = f"e{str(uuid.uuid4())[:8]}-gadget"
-        
-        # Check for product_id uniqueness
-        existing_product = inventory_collection.find_one({'product_id': data['product_id']})
-        if existing_product:
-            data['product_id'] = f"e{str(uuid.uuid4())[:8]}-gadget"
+        # Generate a unique product_id
+        data['product_id'] = f"e{str(uuid.uuid4())[:8]}-gadget"
         
         result = inventory_collection.insert_one(data)
         return jsonify({
@@ -231,7 +226,7 @@ def add_product():
         }), 201
     except Exception as e:
         app.logger.error(f"Error adding product: {str(e)}")
-        return jsonify({"error": "Failed to add product"}), 500
+        return jsonify({"error": f"Failed to add product: {str(e)}"}), 500
 
 @app.route('/api/inventory/<product_id>', methods=['PUT'])
 @jwt_required()
@@ -240,28 +235,13 @@ def update_product(product_id):
         user_id = get_jwt_identity()
         data = request.json
         
-        # Remove _id from data if it exists as we don't want to update this
+        # Remove _id from data if it exists
         if '_id' in data:
             del data['_id']
             
-        # Ensure product belongs to user
-        existing_product = inventory_collection.find_one({
-            "$or": [
-                {"_id": ObjectId(product_id)},
-                {"product_id": product_id}
-            ],
-            "user_id": user_id
-        })
-        
-        if not existing_product:
-            return jsonify({"error": "Product not found or unauthorized"}), 404
-            
         result = inventory_collection.update_one(
             {
-                "$or": [
-                    {"_id": ObjectId(product_id)},
-                    {"product_id": product_id}
-                ],
+                "product_id": product_id,
                 "user_id": user_id
             },
             {"$set": data}
@@ -273,30 +253,23 @@ def update_product(product_id):
             return jsonify({"msg": "No changes made"}), 200
         else:
             return jsonify({"error": "Product not found"}), 404
-            
     except Exception as e:
         app.logger.error(f"Error updating product: {str(e)}")
-        return jsonify({"error": "Failed to update product"}), 500
-        
+        return jsonify({"error": f"Failed to update product: {str(e)}"}), 500
+
 @app.route('/api/inventory/<product_id>', methods=['DELETE'])
 @jwt_required()
 def delete_product(product_id):
     try:
         user_id = get_jwt_identity()
-        app.logger.info(f"Attempting to delete product with ID: {product_id}")
         result = inventory_collection.delete_one({
-            "$or": [
-                {"_id": ObjectId(product_id)},
-                {"product_id": product_id}
-            ],
+            "product_id": product_id,
             "user_id": user_id
         })
         
         if result.deleted_count > 0:
-            app.logger.info(f"Successfully deleted product with ID: {product_id}")
             return jsonify({"msg": "Product deleted successfully"}), 200
         else:
-            app.logger.warning(f"Product with ID {product_id} not found for deletion")
             return jsonify({"error": "Product not found"}), 404
     except Exception as e:
         app.logger.error(f"Error deleting product: {str(e)}")
@@ -470,24 +443,6 @@ def update_sales_after_bill(bill):
             "profit": bill['total_profit']
         })
 
-    # Update weekly sales
-    week_start = bill['date'] - timedelta(days=bill['date'].weekday())
-    weekly_sale = weekly_sales_collection.find_one({
-        "date": week_start
-    })
-
-    if weekly_sale:
-        weekly_sales_collection.update_one(
-            {"_id": weekly_sale['_id']},
-            {"$inc": {"revenue": bill['total_amount'], "profit": bill['total_profit']}}
-        )
-    else:
-        weekly_sales_collection.insert_one({
-            "date": week_start,
-            "revenue": bill['total_amount'],
-            "profit": bill['total_profit']
-        })
-
     # Update monthly sales
     month_start = bill['date'].replace(day=1)
     monthly_sale = monthly_sales_collection.find_one({
@@ -523,7 +478,7 @@ def update_sales_after_bill(bill):
             "revenue": bill['total_amount'],
             "profit": bill['total_profit']
         })
-
+                
 @app.route('/api/generate-bill', methods=['POST'])
 @jwt_required()
 def generate_bill():
@@ -531,34 +486,45 @@ def generate_bill():
         user_id = get_jwt_identity()
         data = request.json
 
-        # Calculate profit for each product and update inventory
+        # Validate input data
+        if not all(key in data for key in ['products', 'businessDetails']):
+            return jsonify({"error": "Missing required fields"}), 400
+
         total_profit = 0
         total_amount = 0
         products_with_profit = []
-        for product in data['products']:
-            inv_product = inventory_collection.find_one({"user_id": user_id, "product": product['product']})
-            if inv_product:
-                cost_price = inv_product.get('cost_price', 0)
-                selling_price = product['price']
-                quantity = product['quantity']
-                profit = (selling_price - cost_price) * quantity
-                total_profit += profit
-                total_amount += selling_price * quantity
-                product_with_profit = product.copy()
-                product_with_profit['profit'] = profit
-                products_with_profit.append(product_with_profit)
 
-                # Update inventory quantity
-                new_quantity = inv_product['quantity'] - quantity
-                if new_quantity < 0:
-                    return jsonify({"error": f"Insufficient stock for {product['product']}"}), 400
-                
-                inventory_collection.update_one(
-                    {"_id": inv_product['_id']},
-                    {"$set": {"quantity": new_quantity}}
-                )
-            else:
+        for product in data['products']:
+            if not all(key in product for key in ['product', 'quantity', 'price']):
+                return jsonify({"error": f"Invalid product data: {product}"}), 400
+
+            inv_product = inventory_collection.find_one(
+                {"user_id": user_id, "product": product['product']}
+            )
+
+            if not inv_product:
                 return jsonify({"error": f"Product {product['product']} not found in inventory"}), 404
+
+            cost_price = inv_product.get('cost_price', 0)
+            selling_price = product['price']
+            quantity = product['quantity']
+            profit = (selling_price - cost_price) * quantity
+            total_profit += profit
+            total_amount += selling_price * quantity
+
+            product_with_profit = product.copy()
+            product_with_profit['profit'] = profit
+            products_with_profit.append(product_with_profit)
+
+            # Update inventory quantity
+            new_quantity = inv_product['quantity'] - quantity
+            if new_quantity < 0:
+                return jsonify({"error": f"Insufficient stock for {product['product']}"}), 400
+
+            inventory_collection.update_one(
+                {"_id": inv_product['_id']},
+                {"$set": {"quantity": new_quantity}}
+            )
 
         # Create a new bill document
         bill = {
@@ -574,39 +540,39 @@ def generate_bill():
         result = bills_collection.insert_one(bill)
         bill_id = str(result.inserted_id)
 
-        # After inserting the bill, update the sales collection
+        # Update the sales collection
         update_sales_after_bill(bill)
 
         # Generate PDF
         buffer = BytesIO()
         p = canvas.Canvas(buffer, pagesize=letter)
-        
+
         # Add content to PDF
         p.drawString(100, 750, f"Bill ID: {bill_id}")
         p.drawString(100, 730, f"Date: {bill['date'].strftime('%Y-%m-%d %H:%M:%S')}")
         p.drawString(100, 710, f"Business Name: {bill['business_details']['businessName']}")
         p.drawString(100, 690, f"GST Number: {bill['business_details']['gstNumber']}")
-        
+
         y = 650
         for product in data['products']:
             p.drawString(100, y, f"{product['product']} - Qty: {product['quantity']} - Price: ₹{product['price']} - Total: ₹{product['quantity'] * product['price']}")
             y -= 20
-        
+
         p.drawString(100, y-20, f"Total Amount: ₹{bill['total_amount']}")
-        
+
         p.showPage()
         p.save()
-        
+
         buffer.seek(0)
-        
+
         response = make_response(buffer.getvalue())
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'attachment; filename=bill_{bill_id}.pdf'
-        
+
         return response
 
     except Exception as e:
-        app.logger.error(f"Error generating bill: {str(e)}")
+        app.logger.error(f"Error generating bill: {str(e)}", exc_info=True)
         return jsonify({"error": "An error occurred while generating the bill"}), 500
 
 @app.route('/api/sales', methods=['GET'])

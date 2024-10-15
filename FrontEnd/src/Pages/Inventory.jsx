@@ -52,8 +52,7 @@ const Inventory = () => {
       setIsLoading(true);
       const token = localStorage.getItem('token');
       
-      // Use product_id if available, otherwise use _id
-      const productId = productData.product_id || productData._id;
+      const productId = productData.product_id;
       
       if (!productId) {
         throw new Error('Product ID is missing');
@@ -69,19 +68,18 @@ const Inventory = () => {
       setIsLoading(false);
     }
   };
-
+  
   const handleDeleteProduct = async (product) => {
     try {
       setError(null);
       setIsLoading(true);
       
-      // Use product_id if available, otherwise use _id
-      const productId = product.product_id || product._id;
+      const productId = product.product_id;
       
       if (!productId) {
         throw new Error('Product ID is missing');
       }
-
+  
       if (window.confirm('Are you sure you want to delete this product?')) {
         const token = localStorage.getItem('token');
         await deleteProduct(token, productId);
@@ -94,7 +92,7 @@ const Inventory = () => {
       setIsLoading(false);
     }
   };
-  
+        
   const handleDownloadData = async () => {
     try {
       setError(null);

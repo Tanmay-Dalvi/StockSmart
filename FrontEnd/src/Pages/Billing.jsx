@@ -118,22 +118,18 @@ const Billing = () => {
           return;
         }
       }
-
+  
       const token = localStorage.getItem('token');
       const billData = {
-        products: selectedProducts.map(product => {
-          const inventoryProduct = inventory.find(i => i.product === product.product);
-          return {
-            product: product.product,
-            quantity: product.quantity,
-            price: product.price,
-            productId: inventoryProduct._id // Include the product ID for database update
-          };
-        }),
-        totalAmount,
+        products: selectedProducts.map(product => ({
+          product: product.product,
+          quantity: product.quantity,
+          price: product.price,
+          productId: product.inventoryId // Make sure this is included
+        })),
         businessDetails
       };
-
+  
       const response = await generateBill(token, billData);
       
       // Create a Blob from the response data
@@ -175,7 +171,7 @@ const Billing = () => {
       setError('Failed to generate bill: ' + (error.response?.data?.error || error.message));
     }
   };
-
+    
   // Rest of the component remains the same...
   return (
     <div className="billing-container">
