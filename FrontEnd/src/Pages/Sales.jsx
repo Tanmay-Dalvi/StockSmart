@@ -5,7 +5,6 @@ import './Sales.css';
 const Sales = () => {
   const [salesData, setSalesData] = useState({
     daily: { revenue: 0, profit: 0 },
-    weekly: { revenue: 0, profit: 0 },
     monthly: { revenue: 0, profit: 0 },
     yearly: { revenue: 0, profit: 0 }
   });
@@ -42,11 +41,6 @@ const Sales = () => {
           <h2>Today's Sales</h2>
           <p>Revenue: {formatCurrency(salesData.daily.revenue)}</p>
           <p>Profit: {formatCurrency(salesData.daily.profit)}</p>
-        </div>
-        <div className="sales-card">
-          <h2>This Week's Sales</h2>
-          <p>Revenue: {formatCurrency(salesData.weekly.revenue)}</p>
-          <p>Profit: {formatCurrency(salesData.weekly.profit)}</p>
         </div>
         <div className="sales-card">
           <h2>This Month's Sales</h2>
