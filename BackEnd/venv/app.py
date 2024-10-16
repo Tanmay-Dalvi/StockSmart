@@ -385,8 +385,8 @@ def generate_bill():
         result = bills_collection.insert_one(bill)
         bill_id = str(result.inserted_id)
 
-        # Update the sales collection
-        update_sales_after_bill(bill)
+        # Update sales data
+        update_sales_data(user_id, total_amount, total_profit)
 
         # Generate PDF
         buffer = BytesIO()
@@ -420,83 +420,32 @@ def generate_bill():
         app.logger.error(f"Error generating bill: {str(e)}", exc_info=True)
         return jsonify({"error": "An error occurred while generating the bill"}), 500
 
-def calculate_sales():
-    # Clear existing sales data
-    daily_sales_collection.delete_many({})
-    monthly_sales_collection.delete_many({})
-    yearly_sales_collection.delete_many({})
+def update_sales_data(user_id, total_amount, total_profit):
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    # Update daily sales
+    daily_sales_collection.update_one(
+        {"user_id": user_id, "date": today},
+        {"$inc": {"revenue": total_amount, "profit": total_profit}},
+        upsert=True
+    )
 
-    # Calculate daily sales
-    start_date = datetime(2023, 9, 1)  # Start from September 2023
-    end_date = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    current_date = start_date
+    # Update monthly sales
+    start_of_month = today.replace(day=1)
+    monthly_sales_collection.update_one(
+        {"user_id": user_id, "date": start_of_month},
+        {"$inc": {"revenue": total_amount, "profit": total_profit}},
+        upsert=True
+    )
 
-    while current_date <= end_date:
-        daily_bills = bills_collection.find({
-            "date": {
-                "$gte": current_date,
-                "$lt": current_date + timedelta(days=1)
-            }
-        })
-
-        daily_revenue = sum(bill['total_amount'] for bill in daily_bills)
-        daily_profit = sum(bill['total_profit'] for bill in daily_bills)
-
-        daily_sales_collection.insert_one({
-            "date": current_date,
-            "revenue": daily_revenue,
-            "profit": daily_profit
-        })
-
-        current_date += timedelta(days=1)
-
-    # Calculate monthly sales
-    current_month_start = start_date.replace(day=1)
-
-    while current_month_start <= end_date:
-        next_month = current_month_start.replace(day=28) + timedelta(days=4)
-        month_end = next_month - timedelta(days=next_month.day)
-        monthly_bills = bills_collection.find({
-            "date": {
-                "$gte": current_month_start,
-                "$lt": month_end + timedelta(days=1)
-            }
-        })
-
-        monthly_revenue = sum(bill['total_amount'] for bill in monthly_bills)
-        monthly_profit = sum(bill['total_profit'] for bill in monthly_bills)
-
-        monthly_sales_collection.insert_one({
-            "date": current_month_start,
-            "revenue": monthly_revenue,
-            "profit": monthly_profit
-        })
-
-        current_month_start = month_end + timedelta(days=1)
-
-    # Calculate yearly sales
-    current_year_start = start_date.replace(month=1, day=1)
-
-    while current_year_start <= end_date:
-        year_end = current_year_start.replace(month=12, day=31)
-        yearly_bills = bills_collection.find({
-            "date": {
-                "$gte": current_year_start,
-                "$lt": year_end + timedelta(days=1)
-            }
-        })
-
-        yearly_revenue = sum(bill['total_amount'] for bill in yearly_bills)
-        yearly_profit = sum(bill['total_profit'] for bill in yearly_bills)
-
-        yearly_sales_collection.insert_one({
-            "date": current_year_start,
-            "revenue": yearly_revenue,
-            "profit": yearly_profit
-        })
-
-        current_year_start = year_end + timedelta(days=1)
-
+    # Update yearly sales
+    start_of_year = today.replace(month=1, day=1)
+    yearly_sales_collection.update_one(
+        {"user_id": user_id, "date": start_of_year},
+        {"$inc": {"revenue": total_amount, "profit": total_profit}},
+        upsert=True
+    )
+            
 @app.route('/api/sales', methods=['GET'])
 @jwt_required()
 def get_sales():
@@ -507,77 +456,38 @@ def get_sales():
         start_of_year = today.replace(month=1, day=1)
 
         # Fetch Daily Sales
-        daily = daily_sales_collection.find_one({"date": today}) or {"revenue": 0, "profit": 0}
+        daily_sales = bills_collection.aggregate([
+            {"$match": {"user_id": user_id, "date": {"$gte": today, "$lt": today + timedelta(days=1)}}},
+            {"$group": {"_id": None, "revenue": {"$sum": "$total_amount"}, "profit": {"$sum": "$total_profit"}}}
+        ]).next()
 
         # Fetch Monthly Sales
-        monthly = monthly_sales_collection.find_one({"date": start_of_month}) or {"revenue": 0, "profit": 0}
+        monthly_sales = bills_collection.aggregate([
+            {"$match": {"user_id": user_id, "date": {"$gte": start_of_month, "$lt": today + timedelta(days=1)}}},
+            {"$group": {"_id": None, "revenue": {"$sum": "$total_amount"}, "profit": {"$sum": "$total_profit"}}}
+        ]).next()
 
         # Fetch Yearly Sales
-        yearly = yearly_sales_collection.find_one({"date": start_of_year}) or {"revenue": 0, "profit": 0}
+        yearly_sales = bills_collection.aggregate([
+            {"$match": {"user_id": user_id, "date": {"$gte": start_of_year, "$lt": today + timedelta(days=1)}}},
+            {"$group": {"_id": None, "revenue": {"$sum": "$total_amount"}, "profit": {"$sum": "$total_profit"}}}
+        ]).next()
 
         return jsonify({
-            "daily": {"revenue": daily["revenue"], "profit": daily["profit"]},
-            "monthly": {"revenue": monthly["revenue"], "profit": monthly["profit"]},
-            "yearly": {"revenue": yearly["revenue"], "profit": yearly["profit"]}
+            "daily": {"revenue": daily_sales.get("revenue", 0), "profit": daily_sales.get("profit", 0)},
+            "monthly": {"revenue": monthly_sales.get("revenue", 0), "profit": monthly_sales.get("profit", 0)},
+            "yearly": {"revenue": yearly_sales.get("revenue", 0), "profit": yearly_sales.get("profit", 0)}
         }), 200
 
+    except StopIteration:
+        return jsonify({
+            "daily": {"revenue": 0, "profit": 0},
+            "monthly": {"revenue": 0, "profit": 0},
+            "yearly": {"revenue": 0, "profit": 0}
+        }), 200
     except Exception as e:
         app.logger.error(f"Error fetching sales data: {str(e)}")
         return jsonify({"error": "An error occurred while fetching sales data"}), 500
-
-def update_sales_after_bill(bill):
-    # Update daily sales
-    daily_sale = daily_sales_collection.find_one({
-        "date": bill['date'].replace(hour=0, minute=0, second=0, microsecond=0)
-    })
-
-    if daily_sale:
-        daily_sales_collection.update_one(
-            {"_id": daily_sale['_id']},
-            {"$inc": {"revenue": bill['total_amount'], "profit": bill['total_profit']}}
-        )
-    else:
-        daily_sales_collection.insert_one({
-            "date": bill['date'].replace(hour=0, minute=0, second=0, microsecond=0),
-            "revenue": bill['total_amount'],
-            "profit": bill['total_profit']
-        })
-
-    # Update monthly sales
-    month_start = bill['date'].replace(day=1)
-    monthly_sale = monthly_sales_collection.find_one({
-        "date": month_start
-    })
-
-    if monthly_sale:
-        monthly_sales_collection.update_one(
-            {"_id": monthly_sale['_id']},
-            {"$inc": {"revenue": bill['total_amount'], "profit": bill['total_profit']}}
-        )
-    else:
-        monthly_sales_collection.insert_one({
-            "date": month_start,
-            "revenue": bill['total_amount'],
-            "profit": bill['total_profit']
-        })
-
-    # Update yearly sales
-    year_start = bill['date'].replace(month=1, day=1)
-    yearly_sale = yearly_sales_collection.find_one({
-        "date": year_start
-    })
-
-    if yearly_sale:
-        yearly_sales_collection.update_one(
-            {"_id": yearly_sale['_id']},
-            {"$inc": {"revenue": bill['total_amount'], "profit": bill['total_profit']}}
-        )
-    else:
-        yearly_sales_collection.insert_one({
-            "date": year_start,
-            "revenue": bill['total_amount'],
-            "profit": bill['total_profit']
-        })
         
 @app.route('/api/test-db', methods=['GET'])
 def test_db():
@@ -591,5 +501,4 @@ def test_db():
         return jsonify({"error": f"Database connection failed: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    calculate_sales()
     app.run(debug=True, port=5000)

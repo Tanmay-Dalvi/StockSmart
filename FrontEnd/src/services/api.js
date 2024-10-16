@@ -195,11 +195,22 @@ export const generateBill = async (token, billData) => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      responseType: 'blob'  // Important for receiving binary data (PDF)
+      responseType: 'blob'
     });
     
-    return response.data;
+    // Check if the response is actually a blob
+    if (response.data instanceof Blob) {
+      return response.data;
+    } else {
+      throw new Error('Received invalid data format from server');
+    }
   } catch (error) {
+    console.error('Generate bill error:', error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+    }
     throw handleApiError(error);
   }
 };
