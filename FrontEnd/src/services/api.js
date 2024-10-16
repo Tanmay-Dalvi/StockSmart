@@ -229,3 +229,18 @@ export const getSalesData = async (token) => {
     throw handleApiError(error);
   }
 };
+
+export const getMLPredictions = async (token) => {
+  try {
+    const response = await axios.get(`${API_URL}/ml-predictions`, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    throw handleApiError(error);
+  }
+};

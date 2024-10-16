@@ -221,7 +221,7 @@ const Billing = () => {
               <td>₹{product.price}</td>
               <td>₹{product.price * product.quantity}</td>
               <td>
-                <button onClick={() => removeProductFromBill(index)}>Remove</button>
+                <button id="removeBtn" onClick={() => removeProductFromBill(index)}>Remove</button>
               </td>
             </tr>
           ))}

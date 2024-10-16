@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file, make_response
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_caching import Cache
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask_cors import CORS
@@ -17,8 +18,10 @@ from datetime import datetime, timedelta
 from datetime import datetime, timedelta
 import uuid
 import logging
+from ml_model import get_ml_predictions, connect_to_mongodb
 
 app = Flask(__name__)
+app.config['DEBUG'] = True
 
 # Enable CORS for all routes
 CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000"], "methods": ["GET", "POST", "PUT", "DELETE"], "allow_headers": ["Content-Type", "Authorization"]}})
@@ -445,7 +448,7 @@ def update_sales_data(user_id, total_amount, total_profit):
         {"$inc": {"revenue": total_amount, "profit": total_profit}},
         upsert=True
     )
-            
+
 @app.route('/api/sales', methods=['GET'])
 @jwt_required()
 def get_sales():
@@ -488,7 +491,30 @@ def get_sales():
     except Exception as e:
         app.logger.error(f"Error fetching sales data: {str(e)}")
         return jsonify({"error": "An error occurred while fetching sales data"}), 500
+
+@app.route('/api/ml-predictions', methods=['GET'])
+@jwt_required()
+@cache.memoize(timeout=3600)
+def ml_predictions():
+    try:
+        user_id = get_jwt_identity()
+        if not user_id:
+            return jsonify({"error": "User not authenticated"}), 401
+            
+        predictions = get_ml_predictions(mongo.db, user_id)
         
+        if 'error' in predictions:
+            return jsonify(predictions), 200  # Still return 200 with error message in data
+            
+        return jsonify(predictions), 200
+        
+    except Exception as e:
+        app.logger.error(f"Error getting ML predictions: {str(e)}")
+        return jsonify({
+            "error": "An error occurred while getting ML predictions",
+            "details": str(e)
+        }), 500
+
 @app.route('/api/test-db', methods=['GET'])
 def test_db():
     try:
