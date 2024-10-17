@@ -132,20 +132,23 @@ def predict_next_month(product_data):
     else:
         return 0, None, None
 
-def generate_reports_for_user(df_bills):
+def generate_reports_for_user(df_bills, df_inventory):
     # Calculate sales data
     daily_sales = calculate_sales(df_bills, 'D')
     monthly_sales = calculate_sales(df_bills, 'M')
     yearly_sales = calculate_sales(df_bills, 'Y')
 
     # Generate sales graphs
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 5))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10))
     daily_sales.plot(x='date', y='total_amount', ax=ax1)
     ax1.set_title("Daily Sales")
+    ax1.set_xlabel("Date")
+    ax1.set_ylabel("Total Amount")
+    
     monthly_sales.plot(x='date', y='total_amount', kind='bar', ax=ax2)
     ax2.set_title("Monthly Sales")
-    yearly_sales.plot(x='date', y='total_amount', kind='bar', ax=ax3)
-    ax3.set_title("Yearly Sales")
+    ax2.set_xlabel("Month")
+    ax2.set_ylabel("Total Amount")
     plt.tight_layout()
     sales_graphs = plot_to_base64(fig)
     plt.close(fig)
@@ -166,44 +169,43 @@ def generate_reports_for_user(df_bills):
     # Categorize product demand
     product_demand_category = categorize_demand(df_bills)
 
-    # Predict next month's stock
+    # Prepare product demand data for frontend chart
+    demand_counts = product_demand_category.value_counts()
+    product_demand_data = [
+        {"name": category, "value": count} 
+        for category, count in demand_counts.items()
+    ]
+
+    # Ensure stock_predictions are generated
     daily_product_sales = df_bills.groupby(['date', 'product_name'])['product_quantity'].sum().unstack(fill_value=0)
     predictions = {}
     for product in daily_product_sales.columns:
         recommended_stock, mae, rmse = predict_next_month(daily_product_sales[product])
         predictions[product] = {"recommended_stock": recommended_stock, "mae": mae, "rmse": rmse}
 
-    # Generate product sales pie chart
-    fig, ax = plt.subplots(figsize=(12, 8))
-    product_sales = df_bills.groupby('product_name')['revenue'].sum()
-    plt.pie(product_sales.values, labels=product_sales.index, autopct='%1.1f%%')
-    plt.title("Product Sales Distribution")
-    plt.axis('equal')
-    plt.tight_layout()
-    product_sales_pie = plot_to_base64(fig)
-    plt.close(fig)
-
     return {
         "sales_graphs": sales_graphs,
         "top_products": top_products.to_dict(),
         "top_products_chart": top_products_chart,
         "product_demand_category": product_demand_category.to_dict(),
-        "stock_predictions": predictions,
-        "product_sales_pie": product_sales_pie
+        "product_demand_data": product_demand_data,
+        "stock_predictions": predictions  # Ensure this is included
     }
 
 def get_ml_predictions(db, user_id):
     try:
         # Fetch bills data for the specific user
         bills_data = fetch_bills_data(db, user_id)
+        inventory_data = fetch_inventory_data(db, user_id)
         
         if not bills_data:
-            return {"error": "No data found for the user"}
+            return {"error": "No bills data found for the user"}
 
         df_bills = process_bills_data(bills_data)
+        df_inventory = process_inventory_data(inventory_data) if inventory_data else None
         
         # Generate reports based on the user's data
-        reports = generate_reports_for_user(df_bills)
+        reports = generate_reports_for_user(df_bills, df_inventory)
         
         return reports
     except Exception as e:

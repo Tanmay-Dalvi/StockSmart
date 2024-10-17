@@ -515,7 +515,7 @@ def ml_predictions():
             "error": "An error occurred while getting ML predictions",
             "details": str(e)
         }), 500
-
+        
 @app.route('/api/test-db', methods=['GET'])
 def test_db():
     try:

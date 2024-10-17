@@ -1,0 +1,86 @@
+.dashboard-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .dashboard-container h1, .dashboard-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  
+  .sales-overview, .sales-charts, .top-products, .product-demand {
+    margin-bottom: 40px;
+  }
+  
+  .sales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .sales-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .sales-card:hover {
+    transform: translateY(-5px);
+    background-color: #e8f5e9;
+  }
+  
+  .sales-card h3 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .sales-card p {
+    font-size: 1.1rem;
+    color: #666;
+    margin: 5px 0;
+  }
+  
+  .sales-card p:last-child {
+    color: #4caf50;
+    font-weight: bold;
+  }
+  
+  .sales-charts img {
+    max-width: 70%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .top-products img {
+    max-width: 60%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-demand {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 56.9%;
+  }
+  
+  @media (max-width: 768px) {
+    .sales-grid {
+      grid-template-columns: 1fr;
+    }
+  }
