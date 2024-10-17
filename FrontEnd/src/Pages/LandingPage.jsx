@@ -43,7 +43,7 @@ const LandingPage = () => {
             </div>
 
             <div className="lp-ui-screenshot-section">
-                <img src="../uidesign.jpg" alt="UI Screenshot" />
+                <img src="../uidesign.png" alt="UI Screenshot" />
                 <p>Discover the user-friendly interface that makes inventory management a breeze.</p>
             </div>
 
