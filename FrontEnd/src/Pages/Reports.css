@@ -45,11 +45,11 @@
     flex: 1;
     max-width: 30%;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #bdbcbc;
     border-radius: 8px;
     text-align: center;
     position: relative;
-    background-color: #f9f9f9;
+    background-color: #fbf4e5;
   }
   
   .product-rank {
