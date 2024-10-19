@@ -12,8 +12,12 @@ import base64
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from pymongo import MongoClient
 import json
+import logging
 
 warnings.filterwarnings('ignore')
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def connect_to_mongodb():
     try:
@@ -55,11 +59,22 @@ def process_bills_data(bills_data):
             df_bills['product_price'] = df_bills['products'].apply(lambda x: x.get('price', 0))
         
         df_bills['date'] = pd.to_datetime(df_bills['date'])
-        df_bills['revenue'] = df_bills['product_quantity'] * df_bills['product_price']
+        df_bills['total_amount'] = df_bills['product_quantity'] * df_bills['product_price']
         
+        # Assuming a fixed profit margin of 20% for this example
+        df_bills['total_profit'] = df_bills['total_amount'] * 0.2
+        
+        # Group by date and product_name to eliminate duplicates
+        df_bills = df_bills.groupby(['date', 'product_name']).agg({
+            'product_quantity': 'sum',
+            'total_amount': 'sum',
+            'total_profit': 'sum'
+        }).reset_index()
+        
+        logger.debug(f"Processed bills data columns: {df_bills.columns}")
         return df_bills
     except Exception as e:
-        print(f"Error processing bills data: {e}")
+        logger.exception(f"Error processing bills data: {e}")
         return pd.DataFrame()
 
 def process_inventory_data(inventory_data):
@@ -101,12 +116,17 @@ def categorize_demand(df_bills):
     return product_demand.apply(categorize)
 
 def predict_next_month(product_data):
-    if len(product_data) > 0:
+    if len(product_data) > 12:  # Ensure we have enough data points
         try:
-            if not isinstance(product_data.index, pd.DatetimeIndex):
-                product_data.index = pd.date_range(start=product_data.index.min(), periods=len(product_data), freq='D')
+            # Resample to monthly frequency and sum the values
+            product_data = product_data.resample('M').sum()
 
-            product_data = product_data.fillna(method='ffill')
+            # Remove any remaining zero values
+            product_data = product_data[product_data > 0]
+
+            if len(product_data) < 12:
+                print(f"Insufficient non-zero monthly data points for prediction")
+                return None, None, None
 
             train_size = int(len(product_data) * 0.8)
             train, test = product_data[:train_size], product_data[train_size:]
@@ -119,19 +139,23 @@ def predict_next_month(product_data):
             mae = mean_absolute_error(test, predictions)
             rmse = np.sqrt(mean_squared_error(test, predictions))
 
-            forecast = results.forecast(steps=30)
+            # Forecast for the next month
+            next_month_forecast = results.forecast(steps=1)[0]
 
-            avg_daily_sales = product_data.mean()
-            safety_stock = avg_daily_sales * 7
-            recommended_stock = int(forecast.sum() + safety_stock)
+            # Calculate safety stock (e.g., 20% of the forecast)
+            safety_stock = next_month_forecast * 0.2
+
+            # Round up to the nearest integer
+            recommended_stock = max(int(np.ceil(next_month_forecast + safety_stock)), 1)
 
             return recommended_stock, mae, rmse
         except Exception as e:
-            print(f"Error in prediction: {e}")
-            return 0, None, None
+            print(f"Error in prediction for product: {e}")
+            return None, None, None
     else:
-        return 0, None, None
-
+        print(f"Insufficient data for prediction")
+        return None, None, None
+        
 def generate_reports_for_user(df_bills, df_inventory):
     # Calculate sales data
     daily_sales = calculate_sales(df_bills, 'D')
@@ -176,12 +200,12 @@ def generate_reports_for_user(df_bills, df_inventory):
         for category, count in demand_counts.items()
     ]
 
-    # Ensure stock_predictions are generated
-    daily_product_sales = df_bills.groupby(['date', 'product_name'])['product_quantity'].sum().unstack(fill_value=0)
+    daily_product_sales = df_bills.groupby(['date', 'product_name'])['product_quantity'].sum().unstack()
     predictions = {}
     for product in daily_product_sales.columns:
         recommended_stock, mae, rmse = predict_next_month(daily_product_sales[product])
-        predictions[product] = {"recommended_stock": recommended_stock, "mae": mae, "rmse": rmse}
+        if recommended_stock is not None:
+            predictions[product] = {"recommended_stock": recommended_stock, "mae": mae, "rmse": rmse}
 
     return {
         "sales_graphs": sales_graphs,
@@ -198,29 +222,28 @@ def get_ml_predictions(db, user_id):
         bills_data = fetch_bills_data(db, user_id)
         inventory_data = fetch_inventory_data(db, user_id)
         
+        logger.debug(f"Fetched {len(bills_data)} bills and {len(inventory_data)} inventory records")
+
         if not bills_data:
+            logger.warning("No bills data found for the user")
             return {"error": "No bills data found for the user"}
 
         df_bills = process_bills_data(bills_data)
         df_inventory = process_inventory_data(inventory_data) if inventory_data else None
         
+        logger.debug(f"Processed bills data shape: {df_bills.shape}")
+        if df_inventory is not None:
+            logger.debug(f"Processed inventory data shape: {df_inventory.shape}")
+
         # Generate reports based on the user's data
         reports = generate_reports_for_user(df_bills, df_inventory)
         
+        logger.debug(f"Generated reports keys: {reports.keys()}")
+        
         return reports
     except Exception as e:
-        print(f"Error in get_ml_predictions: {e}")
+        logger.exception(f"Error in get_ml_predictions: {e}")
         return {"error": f"An error occurred while generating predictions: {str(e)}"}
-
-if __name__ == "__main__":
-    db = connect_to_mongodb()
-    if db:
-        # For testing purposes, you can use a sample user_id
-        sample_user_id = "sample_user_123"
-        reports = get_ml_predictions(db, sample_user_id)
-        print(json.dumps(reports, indent=2))
-    else:
-        print("Failed to connect to the database")
 
     # Clear any remaining plots
     plt.close('all')
